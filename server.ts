@@ -104,6 +104,7 @@ async function syncMasterTables() {
   }
 
   // 1. Update Patients
+  const patientsToSave: PatientEntity[] = [];
   for (const [ramaNorm, data] of Object.entries(patientMap)) {
     const score = Math.min(100, (data.claims * 6) + (data.spend / 150000) * 15);
     let level = "LOW";
@@ -122,10 +123,14 @@ async function syncMasterTables() {
     patient.totalSpend = data.spend;
     patient.riskScore = parseFloat(score.toFixed(1));
     patient.riskLevel = level;
-    await patientRepo.save(patient);
+    patientsToSave.push(patient);
+  }
+  if (patientsToSave.length > 0) {
+    await patientRepo.save(patientsToSave);
   }
 
   // 2. Update Providers
+  const providersToSave: ProviderEntity[] = [];
   for (const [docNorm, data] of Object.entries(providerMap)) {
     const flagRate = data.claims > 0 ? (data.flagged / data.claims) : 0;
     const score = Math.min(100, (data.claims * 5) + (flagRate * 55));
@@ -139,10 +144,14 @@ async function syncMasterTables() {
     provider.totalPrescriptions = data.claims;
     provider.flaggedPrescriptionsCount = data.flagged;
     provider.riskScore = parseFloat(score.toFixed(1));
-    await providerRepo.save(provider);
+    providersToSave.push(provider);
+  }
+  if (providersToSave.length > 0) {
+    await providerRepo.save(providersToSave);
   }
 
   // 3. Update Facilities
+  const facilitiesToSave: FacilityEntity[] = [];
   for (const [name, data] of Object.entries(facilityMap)) {
     let facility = await facilityRepo.findOneBy({ name });
     if (!facility) {
@@ -151,7 +160,10 @@ async function syncMasterTables() {
     }
     facility.totalClaimsCount = data.claims;
     facility.totalDispensedValue = data.spend;
-    await facilityRepo.save(facility);
+    facilitiesToSave.push(facility);
+  }
+  if (facilitiesToSave.length > 0) {
+    await facilityRepo.save(facilitiesToSave);
   }
 
   console.log(`[Data Engine] Synchronized Master Tables: ${Object.keys(patientMap).length} Patients, ${Object.keys(providerMap).length} Providers, ${Object.keys(facilityMap).length} Facilities.`);
@@ -178,13 +190,17 @@ async function runMLAnomalyEngine() {
     vouchersByPatient[key].push(v);
   }
 
+  const updatedVouchers: VoucherEntity[] = [];
   for (const v of vouchers) {
     const patientClaims = vouchersByPatient[v.ramaNumberNormalized || v.patientNameNormalized] || [];
     const prediction = detector.predict(v, patientClaims);
     v.mlAnomalyScore = prediction.score;
     v.mlAnomalyReason = prediction.reasons.join(" | ");
     v.isMlAnomaly = prediction.isAnomaly;
-    await voucherRepo.save(v);
+    updatedVouchers.push(v);
+  }
+  if (updatedVouchers.length > 0) {
+    await voucherRepo.save(updatedVouchers);
   }
 
   console.log(`[ML Engine] Anomaly scoring completed. Classified ${vouchers.filter(v => v.isMlAnomaly).length} anomalous vouchers.`);
@@ -220,13 +236,15 @@ async function seedDatabaseIfEmpty() {
       { email: "investigator@pharmascan.gov.rw", password: "investigator123", role: "Investigator" },
       { email: "auditor@pharmascan.gov.rw", password: "auditor123", role: "Read-Only" }
     ];
+    const usersToSave = [];
     for (const u of defaultUsers) {
       const user = new UserEntity();
       user.email = u.email;
       user.password = u.password;
       user.role = u.role;
-      await userRepo.save(user);
+      usersToSave.push(user);
     }
+    await userRepo.save(usersToSave);
   }
 
   // 2. Seed Vouchers and Logs
@@ -250,6 +268,7 @@ async function seedDatabaseIfEmpty() {
     { patientName: "Eustache Nsengiyumva", ramaNumber: "RW/007421", date: "2026-06-30", service: "General Consultation", amount: 6000, facilityName: "Remera Health Centre" }
   ];
 
+  const hospitalRecordsToSave = [];
   for (const log of hospitalLogs) {
     const rec = new FacilityRecordEntity();
     rec.patientName = log.patientName;
@@ -260,8 +279,9 @@ async function seedDatabaseIfEmpty() {
     rec.service = log.service;
     rec.amount = log.amount;
     rec.facilityName = log.facilityName;
-    await facilityRepo.save(rec);
+    hospitalRecordsToSave.push(rec);
   }
+  await facilityRepo.save(hospitalRecordsToSave);
 
   // Seed pharmacy claims vouchers (with some anomalies and duplicate spellings)
   const pharmacyVouchers = [
@@ -275,6 +295,7 @@ async function seedDatabaseIfEmpty() {
     { patientName: "Marie G. Mutesi", ramaNumber: "RW/002341", date: "2026-06-27", medicineName: "Amoxicillin 500mg Cap", quantity: 20, amount: 3000, doctorName: "Dr. Gasana Emmanuel", facilityName: "Apex Pharmacy", status: ClaimStatus.INVESTIGATING }
   ];
 
+  const vouchersToSave = [];
   for (const v of pharmacyVouchers) {
     const audit = auditClinicalClaim(v.medicineName, v.quantity, v.amount, v.facilityName);
 
@@ -293,8 +314,9 @@ async function seedDatabaseIfEmpty() {
     vouch.status = v.status;
     vouch.isFlagged = audit.isFlagged;
     vouch.flagReason = audit.flagReason || "";
-    await voucherRepo.save(vouch);
+    vouchersToSave.push(vouch);
   }
+  await voucherRepo.save(vouchersToSave);
 
   // Pre-seed a default investigation case
   const caseRepo = AppDataSource.getRepository(CaseEntity);
@@ -399,7 +421,7 @@ app.post("/api/vouchers/upload", authenticateJWT as any, requireRole(["Admin", "
     const patientResolver = new IdentityResolver(rawPatientNames);
     const doctorResolver = new IdentityResolver(rawDoctorNames);
 
-    const savedVouchers: VoucherEntity[] = [];
+    const vouchersToSave: VoucherEntity[] = [];
 
     for (const row of rows) {
       const rawPatient = String(row[mapped.patientName] || "");
@@ -434,9 +456,10 @@ app.post("/api/vouchers/upload", authenticateJWT as any, requireRole(["Admin", "
       voucher.isFlagged = audit.isFlagged;
       voucher.flagReason = audit.flagReason || "";
 
-      const saved = await voucherRepo.save(voucher);
-      savedVouchers.push(saved);
+      vouchersToSave.push(voucher);
     }
+
+    const savedVouchers = vouchersToSave.length > 0 ? await voucherRepo.save(vouchersToSave) : [];
 
     // Recalculate Master tables and Train ML with newly added records
     await syncMasterTables();
@@ -494,6 +517,7 @@ app.post("/api/facility-records/upload", authenticateJWT as any, requireRole(["A
     const resolver = new IdentityResolver(rawPatientNames);
 
     let importCount = 0;
+    const recordsToSave: FacilityRecordEntity[] = [];
     for (const row of rows) {
       const rawName = String(row[mapped.patientName] || "");
       const resolvedName = resolver.resolve(rawName);
@@ -513,8 +537,12 @@ app.post("/api/facility-records/upload", authenticateJWT as any, requireRole(["A
       rec.amount = amountVal;
       rec.facilityName = facilityStr;
 
-      await facilityRepo.save(rec);
+      recordsToSave.push(rec);
       importCount++;
+    }
+
+    if (recordsToSave.length > 0) {
+      await facilityRepo.save(recordsToSave);
     }
 
     await logAuditTrail(

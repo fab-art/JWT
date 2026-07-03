@@ -11,22 +11,22 @@ export class VoucherEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   patientName!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   patientNameNormalized!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   ramaNumber!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   ramaNumberNormalized!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   date!: string; // Format: YYYY-MM-DD
 
-  @Column()
+  @Column({ type: "varchar" })
   medicineName!: string;
 
   @Column({ type: "integer", default: 1 })
@@ -35,13 +35,13 @@ export class VoucherEntity {
   @Column({ type: "float", default: 0.0 })
   amount!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   doctorName!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   doctorNameNormalized!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   facilityName!: string;
 
   @Column({ type: "boolean", default: false })
@@ -72,28 +72,28 @@ export class FacilityRecordEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   patientName!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   patientNameNormalized!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   ramaNumber!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   ramaNumberNormalized!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   date!: string; // Format: YYYY-MM-DD
 
-  @Column()
+  @Column({ type: "varchar" })
   service!: string;
 
   @Column({ type: "float", default: 0.0 })
   amount!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   facilityName!: string;
 }
 
@@ -102,13 +102,13 @@ export class InvestigationNoteEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   claimType!: string; // "voucher" | "patient" | "doctor" | "case"
 
-  @Column()
+  @Column({ type: "varchar" })
   targetId!: string; // ID of the patient (RAMA), doctor name, voucher ID, or case ID
 
-  @Column()
+  @Column({ type: "varchar" })
   author!: string; // "Auditor", "Gemini AI", or user email
 
   @Column({ type: "text" })
@@ -124,13 +124,13 @@ export class PatientEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   name!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   ramaNumber!: string;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   ramaNumberNormalized!: string;
 
   @Column({ type: "float", default: 0.0 })
@@ -152,10 +152,10 @@ export class ProviderEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   name!: string;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   nameNormalized!: string;
 
   @Column({ type: "varchar", default: "General Medicine" })
@@ -177,7 +177,7 @@ export class FacilityEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   name!: string;
 
   @Column({ type: "varchar", default: "Kigali" })
@@ -196,7 +196,7 @@ export class CaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   title!: string;
 
   @Column({ type: "text", default: "" })
@@ -208,10 +208,10 @@ export class CaseEntity {
   @Column({ type: "varchar", default: "Unassigned" })
   investigator!: string; // Assigned investigator name/email
 
-  @Column()
+  @Column({ type: "varchar" })
   targetType!: string; // "patient" | "doctor" | "facility" | "claim"
 
-  @Column()
+  @Column({ type: "varchar" })
   targetId!: string; // RAMA number, doctor name, facility name, or claim ID
 
   @Column({ type: "text", default: "" })
@@ -230,13 +230,13 @@ export class AuditTrailEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: "varchar" })
   action!: string; // "CASE_CREATED", "CASE_STATUS_UPDATED", "USER_LOGIN", "CLAIM_AUDITED", etc.
 
-  @Column()
+  @Column({ type: "varchar" })
   userEmail!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   userRole!: string;
 
   @Column({ type: "text", default: "" })
@@ -252,10 +252,10 @@ export class UserEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column({ type: "varchar", unique: true })
   email!: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   password!: string; // Standard hash or text for simpler authentication
 
   @Column({ type: "varchar", default: "Read-Only" })

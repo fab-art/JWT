@@ -48,7 +48,7 @@ export const AppDataSource = new DataSource(
         ssl: false,
       }
     : {
-        type: "sqlite" as any,
+        type: "better-sqlite3",
         database: "pharmascan.db",
         synchronize: true,
         logging: false,

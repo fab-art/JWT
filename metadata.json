@@ -1,0 +1,6 @@
+{
+  "name": "PharmaScan",
+  "description": "Pharmacy claims intelligence and fraud detection platform built with TypeORM, Material UI reporting, and server-side Gemini AI forensic auditing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { Paper, Typography, Box, CircularProgress, Alert } from "@mui/material";
-import { Activity, ShieldCheck, Key, Eye } from "lucide-react";
+import { Activity, ShieldCheck, Key, Eye, UserCircle } from "lucide-react";
 
 interface LoginScreenProps {
   onLoginSuccess: (token: string, user: { email: string; role: string }) => void;
@@ -139,6 +139,21 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               {loading ? "Verifying..." : "Authorize Portal Session"}
             </button>
           </form>
+
+          <div className="relative flex py-4 items-center">
+            <div className="flex-grow border-t border-[#1a1a1a]"></div>
+            <span className="flex-shrink mx-4 text-[9px] text-[#444] uppercase tracking-widest font-bold">OR</span>
+            <div className="flex-grow border-t border-[#1a1a1a]"></div>
+          </div>
+
+          <button
+            onClick={() => handleDemoLogin("Read-Only")}
+            disabled={loading}
+            className="w-full text-xs uppercase tracking-widest font-bold text-[#e0e0e0] bg-[#111] border border-[#1a1a1a] hover:bg-[#1a1a1a] hover:border-[#F27D26]/30 py-2.5 rounded transition-all duration-300 flex items-center justify-center gap-2 mb-2"
+          >
+            <UserCircle size={14} className="text-[#888]" />
+            <span>Continue as Guest</span>
+          </button>
 
           {/* Quick Demologin Selector */}
           <div className="mt-6 pt-6 border-t border-[#1a1a1a] space-y-3">

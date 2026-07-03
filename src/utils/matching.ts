@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { VoucherEntity, FacilityRecordEntity } from "../db/entities";
-import { MatchCategory, MatchResult } from "../types";
-import { jaroWinklerDistance } from "./cleaning";
+import { VoucherEntity, FacilityRecordEntity } from "../db/entities.js";
+import { MatchCategory, MatchResult } from "../types.js";
+import { jaroWinklerDistance } from "./cleaning.js";
 
 /**
  * Calculates date proximity score based on the days difference:

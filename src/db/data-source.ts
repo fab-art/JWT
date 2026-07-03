@@ -14,7 +14,7 @@ import {
   CaseEntity,
   AuditTrailEntity,
   UserEntity
-} from "./entities";
+} from "./entities.js";
 
 const sqlHost = process.env.SQL_HOST;
 const sqlDbName = process.env.SQL_DB_NAME || "pharmascan";

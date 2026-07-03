@@ -4,7 +4,7 @@
  */
 
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { ClaimStatus } from "../types";
+import { ClaimStatus } from "../types.js";
 
 @Entity("vouchers")
 export class VoucherEntity {

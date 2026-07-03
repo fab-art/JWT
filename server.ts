@@ -5,8 +5,8 @@
 
 import "reflect-metadata";
 import path from "path";
-import { initializeDatabase } from "./src/db/data-source";
-import app, { seedDatabaseIfEmpty } from "./src/app";
+import { initializeDatabase } from "./src/db/data-source.js";
+import app, { seedDatabaseIfEmpty } from "./src/app.js";
 import { createServer as createViteServer } from "vite";
 
 const PORT = 3000;

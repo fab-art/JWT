@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { VoucherEntity, FacilityRecordEntity } from "../db/entities";
+import { VoucherEntity, FacilityRecordEntity } from "../db/entities.js";
 
 export interface MLPredictionResult {
   score: number;

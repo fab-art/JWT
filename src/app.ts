@@ -9,7 +9,7 @@ import path from "path";
 import multer from "multer";
 import * as XLSX from "xlsx";
 import { GoogleGenAI } from "@google/genai";
-import { AppDataSource, initializeDatabase } from "./db/data-source";
+import { AppDataSource, initializeDatabase } from "./db/data-source.js";
 import {
   VoucherEntity,
   FacilityRecordEntity,
@@ -20,13 +20,13 @@ import {
   CaseEntity,
   AuditTrailEntity,
   UserEntity
-} from "./db/entities";
-import { ClaimStatus, MatchCategory, RevisitAlert } from "./types";
-import { normalizeDate, normalizeNumeric, normalizeRama, mapColumns, IdentityResolver } from "./utils/cleaning";
-import { auditClinicalClaim } from "./utils/drugs";
-import { matchVoucherToRecords } from "./utils/matching";
-import { PharmaMLAnomalyDetector } from "./utils/anomalyDetector";
-import { signToken, authenticateJWT, requireRole, AuthenticatedRequest } from "./utils/auth";
+} from "./db/entities.js";
+import { ClaimStatus, MatchCategory, RevisitAlert } from "./types.js";
+import { normalizeDate, normalizeNumeric, normalizeRama, mapColumns, IdentityResolver } from "./utils/cleaning.js";
+import { auditClinicalClaim } from "./utils/drugs.js";
+import { matchVoucherToRecords } from "./utils/matching.js";
+import { PharmaMLAnomalyDetector } from "./utils/anomalyDetector.js";
+import { signToken, authenticateJWT, requireRole, AuthenticatedRequest } from "./utils/auth.js";
 
 const app = express();
 
